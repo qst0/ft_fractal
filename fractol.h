@@ -6,13 +6,14 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/10/23 03:27:52 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/15 05:48:36 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/16 07:13:37 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIBGFX_H
-# define LIBGFX_H
+#ifndef FRACTOL_H
+# define FRACTOL_H
 
+# include <stdlib.h>
 # include <math.h>
 # include <mlx.h>
 
@@ -83,6 +84,15 @@ typedef struct	s_view
 {
 	void		*mlx;
 	void		*win;
+	void		*img;
+	char		*pixels;
+	int			*colors;
+	int			num_colors;
+	int			width;
+	int			height;
+	int			bits_per_pixel;
+	int			size_line;
+	int			endian;
 	t_keys		*pressed;
 }				t_view;
 

@@ -1,7 +1,5 @@
-#include <mlx.h>
-#include <stdlib.h>
-#include "fractol.h"
-	
+#include <fractol.h>
+
 /* real to screen */
 #define FX(x) ((int) ((x + 2)/4.0 * width))
 #define FY(y) ((int) ((2 - y)/4.0 * height))
@@ -29,6 +27,17 @@ long colors[] = {
 	0xFB5A38, 0xFB4F39, 0xFB453A, 0xFC3A3A
 };
 
+/*
+** TODO:
+** DRAW INTO AN IMAGE
+** FIX THE OFFSET TO REFLECT THE MOUSE LOCATION + KEY OFFSET ?
+** FIX THE ZOOM TO WORK WITH THE MOUSE
+** UPDATE THE COLORS
+** NORM THE PROJECT
+** GET TRIPPY / TURN IT IN
+**
+*/
+
 int		changed = 1;
 int		max_iter = 128;
 int		count[64];
@@ -40,6 +49,54 @@ int		color_spin = 0;
 double	zoom = 1.0;
 double	x_shift = 0;
 double	y_shift = 0;
+
+/*
+void	draw_point_to_img(t_view *view, int x, int y, int color)
+{
+	if (x > 0 && y > 0 && x < width && y < height)
+	{
+		i = (x * (view->bits_per_pixel / 8)) + (y * view->size_line);
+		view->pixels[i] = color;
+		view->pixels[++i] = color >> 8;
+		view->pixels[++i] = color >> 16;
+	}
+}
+
+void	use_view_image(t_view *view)
+{
+	mlx_put_image_to_window(view->mlx, view->win, view->img, 0, 0);
+	mlx_destroy_image(view->mlx, view->img);
+}
+
+void	create_view_image(t_view *view)
+{
+	view->img  mlx_new_image(view->id, width, height);
+	view->pixels - mlx_get_data_addr(view->img, &(view->bits_per_pixel),
+			&(view->size_line), &(view->endian));
+}
+
+void	init_color_table(t_view *view, int num_of_colors)
+{
+	int				i;
+	float			f;
+	unsigned char	r;
+	unsigned char	g;
+	unsigned char	b;
+
+	view->colors = (int*)malloc(sizeof(int) * num_of_colors);
+	f = 0;
+	i = -1;
+	while (++i < num_of_colors)
+	{
+		r = (cos(f) + 1) * 127;
+		r = (sin(f) + 1) * 127;
+		r = (-cos(f) + 1) * 127;
+		view->colors[i] = b << 16 | g << 8 | r;
+		f += M_PI / colors;
+	}
+	view->num_colors = num_of_colors;
+}
+*/
 
 int		draw_mandelbrot(t_view *view, int pixel_x, int pixel_y)
 {
@@ -184,16 +241,6 @@ void	fill_carpet(t_view *view, int x, int y)
 		mlx_pixel_put(view->mlx, view->win, x, y, 0xAAAAFF);
 }
 
-int		mouse_hook(int button, int x, int y, t_view *view)
-{
-	(void) button;
-	(void) view;
-	mouse_x = x;
-	mouse_y = y;
-	changed = 1;
-	return (0);
-}
-
 int		key_release_hook(int keycode, t_view *view)
 {
 	(void) keycode;
@@ -252,16 +299,51 @@ void	redraw(t_view *view)
 {	
 	changed = 0;
 	mlx_clear_window(view->mlx, view->win);
-	map_fractal(view);
+//	map_fractal(view);
 //	show_fractal(view, fill_carpet);
 //	show_fractal(view, draw_mandelbrot);
-//	show_fractal(view, julia_iter_point);
+	show_fractal(view, julia_iter_point);
 //	show_fractal(view, draw_dopeness);
 }
 
 int		expose_hook(t_view *view)
 {
-	redraw(view);
+	if(changed)
+		redraw(view);
+	return (0);
+}
+
+int		exit_hook(t_view *view)
+{
+	mlx_destroy_window(view->mlx, view->win);
+	exit(0);
+	return (0);
+}
+
+int		motion_hook(int x, int y, t_view *view)
+{
+	(void) view;
+	mouse_x = x;
+	mouse_y = y;
+	return (0);
+}
+
+int		mouse_press_hook(int button, int x, int y, t_view *view)
+{
+	(void) button;
+	(void) view;
+	mouse_x = x;
+	mouse_y = y;
+	changed = 1;
+	return (0);
+}
+
+int		mouse_release_hook(int button, int x, int y, t_view *view)
+{
+	(void) view;
+	(void) button;
+	(void) x;
+	(void) y;
 	return (0);
 }
 
@@ -269,8 +351,11 @@ void	set_hooks(t_view *view)
 {
 	mlx_hook(view->win, 2, 0, key_press_hook, view);
 	mlx_hook(view->win, 3, 0, key_release_hook, view);
-	mlx_mouse_hook(view->win, mouse_hook, view);
-	mlx_expose_hook(view->win, expose_hook, view);
+	mlx_hook(view->win, 4, 0, mouse_press_hook, view);
+	mlx_hook(view->win, 5, 0, mouse_release_hook, view);
+	mlx_hook(view->win, 6, 0, motion_hook, view);
+	mlx_hook(view->win, 12, 0, expose_hook, view);
+	mlx_hook(view->win, 17, 0, exit_hook, view);
 }
 
 int		loop_hook(t_view *view)
@@ -283,8 +368,8 @@ int		loop_hook(t_view *view)
 t_view	*create_view(void *mlx)
 {
 	t_view	*view;
-	view = (t_view*)malloc(sizeof(t_view));
 
+	view = (t_view*)malloc(sizeof(t_view));
 	view->mlx = mlx;
 	return (view);
 }
