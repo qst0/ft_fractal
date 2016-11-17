@@ -5,7 +5,7 @@ NAME = fract_ol
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
-FILES = main.c toggle_keys.c
+FILES = main.c toggle_keys.c mouse_hooks.c image.c hooks.c
 
 SRCS = $(addprefix srcs/, $(FILES))
 
