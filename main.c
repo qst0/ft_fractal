@@ -1,12 +1,22 @@
-#include <fractol.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2016/11/17 05:07:52 by myoung            #+#    #+#             */
+/*   Updated: 2016/11/17 05:16:01 by myoung           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-/* real to screen */
-#define FX(x) ((int) ((x + 2)/4.0 * width))
-#define FY(y) ((int) ((2 - y)/4.0 * height))
+#include <fractol.h>
 
 /*screen to real*/
 #define GX(i) ((i)*4.0/width - 2)
 #define GY(j) ((j)*4.0/height - 2)
+
+#include <stdio.h>
 
 long colors[] = {
 	0x0048EF, 0x0057F0, 0x0166f0, 0x0274F0,
@@ -29,10 +39,10 @@ long colors[] = {
 
 /*
 ** TODO:
-** UPDATE THE COLORS
+** 3rd working with zoom (Julia^3 or something)
+** COMMAND LINE
 ** NORM THE PROJECT
 ** GET TRIPPY / TURN IT IN
-**
 */
 
 int		changed = 1;
@@ -122,60 +132,60 @@ void	put_fractal(t_view *view, int fractal(t_view*, long double, long double, lo
 {
 	int		pixel_y = -1;
 	int		pixel_x;
+	int		i;
 	int		temp_w;
 	int		temp_h;
-	int		i;
+	int		temp_zoom;
+	int		temp_x_shift;
+	int		temp_y_shift;
+	temp_zoom = zoom;
 	temp_w = width;
 	temp_h = height;
-	width = w;
-	height = h;
+	temp_x_shift = x_shift;
+	temp_y_shift = y_shift;
 	while (++pixel_y < h)
 	{
 		pixel_x = -1;
 		while (++pixel_x < w)
 		{
+			width = w;
+			height = h;
+			x_shift = 0;
+			zoom = 1;
 			i = fractal(view, pixel_x, pixel_y,
-							(((4.0 * x / width - 2.0) / zoom) + (x_shift)) / 48,
-							(((4.0 * y / height - 2.0) / zoom) + (y_shift)) / 48);
+							(((4.0 * x / width - 2.0) / 2 * zoom) + (temp_x_shift)) / 24,
+							(((4.0 * y / height - 2.0) / 2 * zoom) + (temp_y_shift)) / 24);
+			zoom = temp_zoom;
+			width = temp_w;
+			height = temp_h;
+			x_shift = temp_x_shift;
 			if (i < max_iter)
-			{
-				mlx_pixel_put(view->mlx, view->win, x + pixel_x, y + pixel_y,
-						colors[(i + color_spin) % 64]);
-				//put_pixel_to_img(view, x, y, colors[(i + color_spin) % 64]);
-			}
+				put_pixel_to_img(view, pixel_x + x, pixel_y + y, view->colors[(i + color_spin) % 64]);
 			else
-			{
-				mlx_pixel_put(view->mlx, view->win, x + pixel_x, y + pixel_y, 0x0);
-			}
+				put_pixel_to_img(view, pixel_x + x, pixel_y + y, 0);
 		}
 	}
-	width = temp_w;
-	height = temp_h;
 }
 
 void	show_fractal(t_view *view, int fractal(t_view*, int, int))
 {
 	int		pixel_y = -1;
 	int		pixel_x;
-	int		iter_count;
+	int		i;
 
 	while (++pixel_y < height)
 	{
 		pixel_x = -1;
 		while (++pixel_x < width)
 		{
-			iter_count = fractal(view, pixel_x, pixel_y); 
-			if (iter_count < max_iter)
+			i = fractal(view, pixel_x, pixel_y); 
+			if (i < max_iter)
 			{
-				mlx_pixel_put(view->mlx, view->win, pixel_x, pixel_y,
-						colors[(iter_count + color_spin) % 64]);
-				put_pixel_to_img(view, pixel_x, pixel_y, colors[(iter_count + color_spin) % 64]);
+				//count[i]++;
+				put_pixel_to_img(view, pixel_x, pixel_y, view->colors[(/*count[i]*/i + color_spin) % 64]);
 			}
 			else
-			{
 				put_pixel_to_img(view, pixel_x, pixel_y, 0x000000);
-				//mlx_pixel_put(view->mlx, view->win, pixel_x, pixel_y, 0x0);
-			}
 		}
 	}
 }
@@ -230,8 +240,9 @@ int		julia_cubed_iter_point(t_view *view, int pixel_x, int pixel_y)
 	return (i);
 }
 
-int		is_filled(int x, int y)
+int		fill_carpet(t_view *view, int x, int y)
 {
+	(void) view;
 	while (x > 0 || y > 0)
 	{
 		if (x % 3 == 1 && y % 3 == 1)
@@ -239,50 +250,7 @@ int		is_filled(int x, int y)
 		x /= 3;
 		y /= 3;
 	}
-	return (1);
-}
-
-void	fill_carpet(t_view *view, int x, int y)
-{
-	if (is_filled(x, y))
-		mlx_pixel_put(view->mlx, view->win, x, y, 0xFF00FF);
-	else
-		mlx_pixel_put(view->mlx, view->win, x, y, 0xAAAAFF);
-}
-
-int		key_release_hook(int keycode, t_view *view)
-{
-	(void) keycode;
-	(void) view;
-	//toggle_pressed(keycode, view, 0);
-	return (0);
-}
-
-int		key_press_hook(int keycode, t_view *view)
-{
-	(void) view;
-	if (keycode == 53)
-		exit(0);
-	//toggle_pressed(keycode, view, 1);
-
-	if (keycode == KEY_A)
-		x_shift += 10;
-	else if (keycode == KEY_D)
-		x_shift -= 10;
-
-	if (keycode == KEY_W)
-		y_shift += 10;
-	else if(keycode == KEY_S)
-		y_shift -= 10;
-
-	if (keycode == KEY_I)
-		zoom = zoom + 1;
-	else if (keycode == KEY_K && zoom > 1)
-		zoom = zoom - 1;
-	else if (keycode == KEY_F)
-		color_spin++;
-	changed = 1;
-	return (0);
+	return (64);
 }
 
 void	map_fractal(t_view *view)
@@ -291,7 +259,7 @@ void	map_fractal(t_view *view)
 	int j;
 	int res;
 	
-	res = 40;
+	res = 20 / zoom;
 	i = -1;
 	while(++i < res)
 	{
@@ -307,13 +275,32 @@ void	map_fractal(t_view *view)
 void	redraw(t_view *view)
 {	
 	changed = 0;
-//	mlx_clear_window(view->mlx, view->win);
 //	map_fractal(view);
-//	show_fractal(view, fill_carpet);
-	show_fractal(view, draw_mandelbrot);
+	show_fractal(view, julia_cubed_iter_point);
+//	show_fractal(view, draw_mandelbrot);
 //	show_fractal(view, julia_iter_point);
-//	show_fractal(view, draw_dopeness);
+
+//	show_fractal(view, fill_carpet);
 	use_view_image(view);
+}
+
+int		key_release_hook(int keycode, t_view *view)
+{
+	toggle_pressed(keycode, view, 0);
+	changed = 1;
+	return (0);
+}
+
+int		key_press_hook(int keycode, t_view *view)
+{
+	(void) view;
+	if(keycode == KEY_SPACE)
+		view->pressed->space = !view->pressed->space;
+	if (keycode == 53)
+		exit(0);
+	toggle_pressed(keycode, view, 1);
+	changed = 1;
+	return (0);
 }
 
 int		expose_hook(t_view *view)
@@ -333,16 +320,22 @@ int		exit_hook(t_view *view)
 int		motion_hook(int x, int y, t_view *view)
 {
 	(void) view;
-	mouse_x = x;
-	mouse_y = y;
-	changed = 1;
+	if(!view->pressed->space)
+	{
+		mouse_x = x;
+		mouse_y = y;
+		changed = 1;
+	}
 	return (0);
 }
 
 int		mouse_press_hook(int button, int x, int y, t_view *view)
 {
-	(void) button;
 	(void) view;
+	if (button == 1)
+		max_iter += 4;
+	else if (button == 2)
+		max_iter -= 8;
 	if (button == 5)
 	{
 		x -= width / 2;
@@ -353,11 +346,11 @@ int		mouse_press_hook(int button, int x, int y, t_view *view)
 	}
 	else if (button == 4)
 	{
-		if(zoom > 1)
-			zoom--;
+		if(zoom > 2)
+			zoom -= 2;
+		if (zoom < 4)
+			zoom = 1;
 	}
-	//mouse_x = x;
-	//mouse_y = y;
 	changed = 1;
 	return (0);
 }
@@ -373,6 +366,7 @@ int		mouse_release_hook(int button, int x, int y, t_view *view)
 
 void	set_hooks(t_view *view)
 {
+	mlx_do_key_autorepeatoff(view->mlx);
 	mlx_hook(view->win, 2, 0, key_press_hook, view);
 	mlx_hook(view->win, 3, 0, key_release_hook, view);
 	mlx_hook(view->win, 4, 0, mouse_press_hook, view);
@@ -382,10 +376,31 @@ void	set_hooks(t_view *view)
 	mlx_hook(view->win, 17, 0, exit_hook, view);
 }
 
-int		loop_hook(t_view *view)
+#define KEY(key) view->pressed->key
+
+int		loop_hook(t_view *v)
 {
+	if (v->pressed->a || v->pressed->s || v->pressed->w ||
+		v->pressed->d || v->pressed->i || v->pressed->k || v->pressed->q)
+	changed = 1;	
+
+	if (v->pressed->a)
+		x_shift += 1;
+	else if (v->pressed->d)
+		x_shift -= 1;
+	if (v->pressed->w)
+		y_shift += 1;
+	else if (v->pressed->s)
+		y_shift -= 1;
+	if (v->pressed->i)
+		zoom++;
+	else if (v->pressed->k && zoom > 1)
+		zoom--;
+	else if (v->pressed->q)
+		color_spin++;
+
 	if(changed)
-		redraw(view);
+		redraw(v);
 	return (0);
 }
 
@@ -394,6 +409,16 @@ t_view	*create_view(void *mlx)
 	t_view	*view;
 
 	view = (t_view*)malloc(sizeof(t_view));
+	view->pressed = (t_keys*)malloc(sizeof(t_keys));
+	KEY(space) = 0;
+	KEY(w) = 0;
+	KEY(a) = 0;
+	KEY(s) = 0;
+	KEY(d) = 0;
+	KEY(i) = 0;
+	KEY(k) = 0;
+	KEY(q) = 0;
+	init_color_table(view, 64);
 	view->mlx = mlx;
 	return (view);
 }

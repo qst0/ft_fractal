@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/10/23 03:27:52 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/16 07:13:37 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/17 01:01:30 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,11 @@
 # define KEY_Z 6
 # define KEY_PLUS 69
 # define KEY_MINUS 78
+# define KEY_SPACE 49
 
 typedef struct	s_keys
 {
+	int			space:1;
 	int			semi:1;
 	int			i:1;
 	int			j:1;
