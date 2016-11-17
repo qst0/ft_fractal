@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/17 05:57:42 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/17 06:14:56 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/17 07:54:10 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,7 @@ void	put_fractal(t_view *v, int fractal(t_view*, long double, long double, long 
 			v->height = temp_h;
 			v->x_shift = temp_x_shift;
 			if (i < v->max_iter)
-				put_pixel_to_img(v, pixel_x + x, pixel_y + y, v->colors[(i + v->color_spin) % 64]);
-			else
-				put_pixel_to_img(v, pixel_x + x, pixel_y + y, 0);
+				put_pixel_to_img(v, pixel_x + x, pixel_y + y, v->colors[(i + v->color_spin) % 128]);
 		}
 	}
 }
@@ -111,11 +109,10 @@ void	show_fractal(t_view *v, int fractal(t_view*, int, int))
 			{
 				if(v->trippy)
 					v->count[i]++;
-				put_pixel_to_img(v, pixel_x, pixel_y, v->colors[((v->trippy ? v->count[i] : i)
+				put_pixel_to_img(v, pixel_x, pixel_y, v->colors[
+						((v->trippy ? v->count[i] + (rand() % 13) : i + (rand() % 13) )
 						   	+ v->color_spin) % 64]);
 			}
-			else
-				put_pixel_to_img(v, pixel_x, pixel_y, 0x000000);
 		}
 	}
 }
@@ -168,19 +165,6 @@ int		julia_cubed_iter_point(t_view *v, int pixel_x, int pixel_y)
 	return (i);
 }
 
-int		fill_carpet(t_view *view, int x, int y)
-{
-	(void) view;
-	while (x > 0 || y > 0)
-	{
-		if (x % 3 == 1 && y % 3 == 1)
-			return (0);
-		x /= 3;
-		y /= 3;
-	}
-	return (64);
-}
-
 void	map_fractal(t_view *v)
 {
 	int i;
@@ -204,10 +188,9 @@ void	redraw(t_view *view)
 {	
 	view->changed = 0;
 //	map_fractal(view);
-	show_fractal(view, julia_cubed_iter_point);
-//	show_fractal(view, draw_mandelbrot);
-//	show_fractal(view, julia_iter_point);
-//	show_fractal(view, fill_carpet);
+//	show_fractal(view, julia_cubed_iter_point);
+	show_fractal(view, draw_mandelbrot);
+//	show_fractal(view, julia_iter_point);	
 	use_view_image(view);
 }
 
@@ -217,15 +200,16 @@ void	init_view(t_view *v)
 {
 	v->changed = 1;
 	v->max_iter = 64;
-	v->width = 600;
-	v->height = 600;
+	v->width = 1200;
+	v->height = 1200;
 	v->mouse_x = 0;
 	v->mouse_y = 0;
 	v->color_spin = 0;
 	v->zoom = 1.0;
 	v->x_shift = 0;
 	v->y_shift = 0;
-	v->trippy = 1;
+	v->trippy = 0;
+	//v->fuzz = 0;
 }
 
 void	set_hooks(t_view *view)
@@ -260,21 +244,19 @@ t_view	*create_view(void *mlx)
 	return (v);
 }
 
-void	begin_loop(void)
+int		main(int argc, char **argv)
 {
+	(void) argc;
+	(void) argv;
 	void	*mlx;
 	t_view	*view;
 
 	mlx = mlx_init();
 	view = create_view(mlx);
 	create_view_image(view);
-	view->win = mlx_new_window(mlx, view->width, view->height, "FRACT_OL");
+	view->win = mlx_new_window(mlx, view->width, view->height,
+		   	"~   F  R  A  C  T  A  L    F  I  N  D  E  R   ~" );
 	set_hooks(view);
 	mlx_loop_hook(mlx, loop_hook, view);
 	mlx_loop(mlx);
-}
-
-int		main(void)
-{
-	begin_loop();
 }

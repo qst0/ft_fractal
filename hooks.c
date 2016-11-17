@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/17 06:07:28 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/17 06:16:27 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/17 07:37:32 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,13 @@ int		loop_hook(t_view *v)
 	v->changed = 1;	
 
 	if (v->pressed->a)
-		v->x_shift += 1;
+		v->x_shift += 10;
 	else if (v->pressed->d)
-		v->x_shift -= 1;
+		v->x_shift -= 10;
 	if (v->pressed->w)
-		v->y_shift += 1;
+		v->y_shift += 10;
 	else if (v->pressed->s)
-		v->y_shift -= 1;
+		v->y_shift -= 10;
 	if (v->pressed->i)
 		v->zoom++;
 	else if (v->pressed->k && v->zoom > 1)
