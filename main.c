@@ -29,9 +29,6 @@ long colors[] = {
 
 /*
 ** TODO:
-** DRAW INTO AN IMAGE
-** FIX THE OFFSET TO REFLECT THE MOUSE LOCATION + KEY OFFSET ?
-** FIX THE ZOOM TO WORK WITH THE MOUSE
 ** UPDATE THE COLORS
 ** NORM THE PROJECT
 ** GET TRIPPY / TURN IT IN
@@ -39,10 +36,10 @@ long colors[] = {
 */
 
 int		changed = 1;
-int		max_iter = 128;
+int		max_iter = 64;
 int		count[64];
-int		width = 1400;
-int		height = 1200;
+int		width = 600;
+int		height = 600;
 double	mouse_x = 0;
 double	mouse_y = 0;
 int		color_spin = 0;
@@ -50,9 +47,10 @@ double	zoom = 1.0;
 double	x_shift = 0;
 double	y_shift = 0;
 
-/*
-void	draw_point_to_img(t_view *view, int x, int y, int color)
+void	put_pixel_to_img(t_view *view, int x, int y, int color)
 {
+	int i;
+
 	if (x > 0 && y > 0 && x < width && y < height)
 	{
 		i = (x * (view->bits_per_pixel / 8)) + (y * view->size_line);
@@ -62,17 +60,18 @@ void	draw_point_to_img(t_view *view, int x, int y, int color)
 	}
 }
 
+void	create_view_image(t_view *view)
+{
+	view->img = mlx_new_image(view->mlx, width, height);
+	view->pixels = mlx_get_data_addr(view->img, &(view->bits_per_pixel),
+			&(view->size_line), &(view->endian));
+}
+
 void	use_view_image(t_view *view)
 {
 	mlx_put_image_to_window(view->mlx, view->win, view->img, 0, 0);
 	mlx_destroy_image(view->mlx, view->img);
-}
-
-void	create_view_image(t_view *view)
-{
-	view->img  mlx_new_image(view->id, width, height);
-	view->pixels - mlx_get_data_addr(view->img, &(view->bits_per_pixel),
-			&(view->size_line), &(view->endian));
+	create_view_image(view);
 }
 
 void	init_color_table(t_view *view, int num_of_colors)
@@ -89,14 +88,13 @@ void	init_color_table(t_view *view, int num_of_colors)
 	while (++i < num_of_colors)
 	{
 		r = (cos(f) + 1) * 127;
-		r = (sin(f) + 1) * 127;
-		r = (-cos(f) + 1) * 127;
+		g = (sin(f) + 1) * 127;
+		b = (-cos(f) + 1) * 127;
 		view->colors[i] = b << 16 | g << 8 | r;
-		f += M_PI / colors;
+		f += M_PI / num_of_colors;
 	}
 	view->num_colors = num_of_colors;
 }
-*/
 
 int		draw_mandelbrot(t_view *view, int pixel_x, int pixel_y)
 {
@@ -140,10 +138,15 @@ void	put_fractal(t_view *view, int fractal(t_view*, long double, long double, lo
 							(((4.0 * x / width - 2.0) / zoom) + (x_shift)) / 48,
 							(((4.0 * y / height - 2.0) / zoom) + (y_shift)) / 48);
 			if (i < max_iter)
+			{
 				mlx_pixel_put(view->mlx, view->win, x + pixel_x, y + pixel_y,
 						colors[(i + color_spin) % 64]);
+				//put_pixel_to_img(view, x, y, colors[(i + color_spin) % 64]);
+			}
 			else
+			{
 				mlx_pixel_put(view->mlx, view->win, x + pixel_x, y + pixel_y, 0x0);
+			}
 		}
 	}
 	width = temp_w;
@@ -163,10 +166,16 @@ void	show_fractal(t_view *view, int fractal(t_view*, int, int))
 		{
 			iter_count = fractal(view, pixel_x, pixel_y); 
 			if (iter_count < max_iter)
+			{
 				mlx_pixel_put(view->mlx, view->win, pixel_x, pixel_y,
 						colors[(iter_count + color_spin) % 64]);
+				put_pixel_to_img(view, pixel_x, pixel_y, colors[(iter_count + color_spin) % 64]);
+			}
 			else
-				mlx_pixel_put(view->mlx, view->win, pixel_x, pixel_y, 0x0);	
+			{
+				put_pixel_to_img(view, pixel_x, pixel_y, 0x000000);
+				//mlx_pixel_put(view->mlx, view->win, pixel_x, pixel_y, 0x0);
+			}
 		}
 	}
 }
@@ -298,12 +307,13 @@ void	map_fractal(t_view *view)
 void	redraw(t_view *view)
 {	
 	changed = 0;
-	mlx_clear_window(view->mlx, view->win);
+//	mlx_clear_window(view->mlx, view->win);
 //	map_fractal(view);
 //	show_fractal(view, fill_carpet);
-//	show_fractal(view, draw_mandelbrot);
-	show_fractal(view, julia_iter_point);
+	show_fractal(view, draw_mandelbrot);
+//	show_fractal(view, julia_iter_point);
 //	show_fractal(view, draw_dopeness);
+	use_view_image(view);
 }
 
 int		expose_hook(t_view *view)
@@ -325,6 +335,7 @@ int		motion_hook(int x, int y, t_view *view)
 	(void) view;
 	mouse_x = x;
 	mouse_y = y;
+	changed = 1;
 	return (0);
 }
 
@@ -332,8 +343,21 @@ int		mouse_press_hook(int button, int x, int y, t_view *view)
 {
 	(void) button;
 	(void) view;
-	mouse_x = x;
-	mouse_y = y;
+	if (button == 5)
+	{
+		x -= width / 2;
+		y -= height / 2;
+		zoom++;
+		x_shift += x / zoom / 1.5;
+		y_shift += y / zoom / 1.5;
+	}
+	else if (button == 4)
+	{
+		if(zoom > 1)
+			zoom--;
+	}
+	//mouse_x = x;
+	//mouse_y = y;
 	changed = 1;
 	return (0);
 }
@@ -381,6 +405,7 @@ void	begin_loop(void)
 
 	mlx = mlx_init();
 	view = create_view(mlx);
+	create_view_image(view);
 	view->win = mlx_new_window(mlx, width, height, "FRACT_OL");
 	set_hooks(view);
 	mlx_loop_hook(mlx, loop_hook, view);
