@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/17 05:52:23 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/17 05:56:09 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/18 06:11:04 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 
 int		motion_hook(int x, int y, t_view *view)
 {
-	(void) view;
-	if(!view->pressed->space)
+	if (!view->pressed->space)
 	{
 		view->mouse_x = x;
 		view->mouse_y = y;
@@ -40,7 +39,7 @@ int		mouse_press_hook(int button, int x, int y, t_view *v)
 	}
 	else if (button == 4)
 	{
-		if(v->zoom > 2)
+		if (v->zoom > 2)
 			v->zoom -= 2;
 		if (v->zoom < 4)
 			v->zoom = 1;
@@ -51,9 +50,9 @@ int		mouse_press_hook(int button, int x, int y, t_view *v)
 
 int		mouse_release_hook(int button, int x, int y, t_view *view)
 {
-	(void) view;
-	(void) button;
-	(void) x;
-	(void) y;
+	(void)view;
+	(void)button;
+	(void)x;
+	(void)y;
 	return (0);
 }

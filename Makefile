@@ -5,7 +5,15 @@ NAME = fract_ol
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
-FILES = main.c toggle_keys.c mouse_hooks.c image.c hooks.c color.c
+FILES = main.c \
+		toggle_keys.c \
+	   	mouse_hooks.c \
+	   	image.c \
+	   	hooks.c \
+		color.c \
+		draw_fractal.c \
+		fractals.c \
+		gfx.c
 
 SRC = $(addprefix src/, $(FILES))
 

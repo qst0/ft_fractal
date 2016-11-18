@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/17 06:07:28 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/17 10:11:08 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/18 06:17:58 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ int		key_release_hook(int keycode, t_view *view)
 
 int		key_press_hook(int keycode, t_view *view)
 {
-	if(keycode == KEY_Z)
+	if (keycode == KEY_Z)
 		trip_color_table(view);
-	if(keycode == KEY_X)
+	if (keycode == KEY_X)
 		hardset_color_table(view);
-	if(keycode == KEY_SPACE)
+	if (keycode == KEY_SPACE)
 		view->pressed->space = !view->pressed->space;
-	if(keycode == KEY_E)
+	if (keycode == KEY_E)
 		view->trippy = !view->trippy;
 	if (keycode == 53)
 		exit(0);
@@ -38,7 +38,7 @@ int		key_press_hook(int keycode, t_view *view)
 
 int		expose_hook(t_view *view)
 {
-	if(view->changed)
+	if (view->changed)
 		redraw(view);
 	return (0);
 }
@@ -54,8 +54,7 @@ int		loop_hook(t_view *v)
 {
 	if (v->pressed->a || v->pressed->s || v->pressed->w ||
 		v->pressed->d || v->pressed->i || v->pressed->k || v->pressed->q)
-	v->changed = 1;	
-
+		v->changed = 1;
 	if (v->pressed->a)
 		v->x_shift += 10;
 	else if (v->pressed->d)
@@ -70,8 +69,7 @@ int		loop_hook(t_view *v)
 		v->zoom--;
 	else if (v->pressed->q)
 		v->color_spin++;
-
-	if(v->changed)
+	if (v->changed)
 		redraw(v);
 	return (0);
 }

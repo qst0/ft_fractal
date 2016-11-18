@@ -6,12 +6,12 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/17 09:24:31 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/17 09:26:19 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/18 06:57:50 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_KEYS_H
-#define FT_KEYS_H
+# define FT_KEYS_H
 
 # define KEY_UP 126
 # define KEY_DOWN 125
