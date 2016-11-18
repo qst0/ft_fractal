@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/17 05:57:42 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/17 07:54:10 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/18 00:28:53 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,6 @@
 /*screen to real*/
 #define GX(i) ((i)*4.0/v->width - 2)
 #define GY(j) ((j)*4.0/v->height - 2)
-
-long colors[] = {
-       0x0048EF, 0x0057F0, 0x0166f0, 0x0274F0,
-       0x0383F0, 0x0491F0, 0x05A0F1, 0x06AEF1,
-       0x07BCF1, 0x08CAF1, 0x08D8f1, 0x09E6F2,
-       0x0AF2F0, 0x0BF2E3, 0x0CF2D5, 0x0DF2C8,
-       0x0EF3BB, 0x0FF3AE, 0x10F3A1, 0x11F394,
-       0x12F388, 0x13F47B, 0x13F46E, 0x14F462,
-       0x15F455, 0x16F449, 0x17F43D, 0x18F531,
-       0x19F525, 0x1BF51A, 0x29F51B, 0x37F51C,
-       0x44F61D, 0x52F61E, 0x5FF61F, 0x6CF620,
-       0x79F621, 0x87F721, 0x94F722, 0xA1F723,
-       0xADF724, 0xBAF725, 0xC7F826, 0xD4F827,
-       0xE0F828, 0xECF829, 0xF8F82A, 0xF8EC2B,
-       0xF9E02C, 0xF9D42D, 0xF9C92E, 0xF9BD2F,
-       0xF9B230, 0xfAA731, 0xFA9B32, 0xFA9033,
-       0xFA8534, 0xFA7A35, 0xFB6F36, 0xFB6537,
-       0xFB5A38, 0xFB4F39, 0xFB453A, 0xFC3A3A
-};
 
 int		draw_mandelbrot(t_view *v, int pixel_x, int pixel_y)
 {
@@ -88,7 +69,7 @@ void	put_fractal(t_view *v, int fractal(t_view*, long double, long double, long 
 			v->height = temp_h;
 			v->x_shift = temp_x_shift;
 			if (i < v->max_iter)
-				put_pixel_to_img(v, pixel_x + x, pixel_y + y, v->colors[(i + v->color_spin) % 128]);
+				put_pixel_to_img(v, pixel_x + x, pixel_y + y, v->colors[(i + v->color_spin) % 64]);
 		}
 	}
 }
@@ -98,6 +79,10 @@ void	show_fractal(t_view *v, int fractal(t_view*, int, int))
 	int		pixel_y = -1;
 	int		pixel_x;
 	int		i;
+
+	i = 0;	
+	while (i < 64)
+		v->count[i++] = 0;
 
 	while (++pixel_y < v->height)
 	{
@@ -110,7 +95,7 @@ void	show_fractal(t_view *v, int fractal(t_view*, int, int))
 				if(v->trippy)
 					v->count[i]++;
 				put_pixel_to_img(v, pixel_x, pixel_y, v->colors[
-						((v->trippy ? v->count[i] + (rand() % 13) : i + (rand() % 13) )
+						((v->trippy ? v->count[i] : i  )
 						   	+ v->color_spin) % 64]);
 			}
 		}
@@ -189,8 +174,8 @@ void	redraw(t_view *view)
 	view->changed = 0;
 //	map_fractal(view);
 //	show_fractal(view, julia_cubed_iter_point);
-	show_fractal(view, draw_mandelbrot);
-//	show_fractal(view, julia_iter_point);	
+//	show_fractal(view, draw_mandelbrot);
+	show_fractal(view, julia_iter_point);	
 	use_view_image(view);
 }
 
@@ -209,7 +194,7 @@ void	init_view(t_view *v)
 	v->x_shift = 0;
 	v->y_shift = 0;
 	v->trippy = 0;
-	//v->fuzz = 0;
+	v->fuzz = 0;
 }
 
 void	set_hooks(t_view *view)
@@ -230,6 +215,7 @@ t_view	*create_view(void *mlx)
 
 	v = (t_view*)malloc(sizeof(t_view));
 	v->pressed = (t_keys*)malloc(sizeof(t_keys));
+	v->fractal = (t_fractal*)malloc(sizeof(t_fractal));
 	init_view(v);
 	KEY(space) = 0;
 	KEY(w) = 0;

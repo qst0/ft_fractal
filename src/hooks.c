@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/17 06:07:28 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/17 07:37:32 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/17 10:11:08 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,10 @@ int		key_release_hook(int keycode, t_view *view)
 
 int		key_press_hook(int keycode, t_view *view)
 {
+	if(keycode == KEY_Z)
+		trip_color_table(view);
+	if(keycode == KEY_X)
+		hardset_color_table(view);
 	if(keycode == KEY_SPACE)
 		view->pressed->space = !view->pressed->space;
 	if(keycode == KEY_E)

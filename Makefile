@@ -5,11 +5,13 @@ NAME = fract_ol
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
-FILES = main.c toggle_keys.c mouse_hooks.c image.c hooks.c
+FILES = main.c toggle_keys.c mouse_hooks.c image.c hooks.c color.c
 
-SRCS = $(addprefix srcs/, $(FILES))
+SRC = $(addprefix src/, $(FILES))
 
 FRAMEWORKS = -framework OpenGL -framework AppKit
+INC = -I ./include
+
 
 INC_MINILIBX = -I minilibx
 LINK_MINILIBX = -L minilibx -lmlx
@@ -22,7 +24,7 @@ minilibx/libmlx.a:
 
 $(NAME): minilibx/libmlx.a
 	$(CC) $(CFLAGS) $(MINILIBX) \
-		-I . $(FRAMEWORKS) $(FILES) -o $(NAME)
+		$(INC) $(FRAMEWORKS) $(SRC) -o $(NAME)
 
 build:
 	mkdir build
