@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/10/23 03:27:52 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/18 00:26:52 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/18 04:29:43 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ typedef struct	s_view
 	int			changed:1;
 	int			trippy:1;
 	int			fuzz:1;
+	char		mode;
 	t_fractal	*fractal;
 	t_keys		*pressed;
 }				t_view;
@@ -60,8 +61,8 @@ int				expose_hook(t_view *view);
 int				exit_hook(t_view *view);
 int				loop_hook(t_view *v);
 
-int				julia_iter_point(t_view *v, int pixel_x, int pixel_y);
-int				julia_cubed_iter_point(t_view *v, int pixel_x, int pixel_y);
+int				julia_iter_point(t_view *v);
+int				julia_cubed_iter_point(t_view *v);
 int				fill_carpet(t_view *view, int x, int y);
 void			map_fractal(t_view *v);
 void			begin_loop(void);
@@ -69,7 +70,7 @@ t_view			*create_view(void *mlx);
 void			set_hooks(t_view *view);
 void			init_view(t_view *v);
 void			redraw(t_view *view);
-void			show_fractal(t_view *v, int fractal(t_view*, int, int));
+void			show_fractal(t_view *v, int fractal(t_view*));
 
 void			toggle_pressed(int keycode, t_view *view, int toggle);
 
