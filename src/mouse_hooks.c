@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/17 05:52:23 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/18 06:11:04 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/18 21:57:50 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,14 @@ int		mouse_press_hook(int button, int x, int y, t_view *v)
 	{
 		x -= v->width / 2;
 		y -= v->height / 2;
-		v->zoom++;
+		v->zoom = (v->zoom + 1) * 1.1;
 		v->x_shift += x / v->zoom / 1.5;
 		v->y_shift += y / v->zoom / 1.5;
 	}
 	else if (button == 4)
 	{
 		if (v->zoom > 2)
-			v->zoom -= 2;
+			v->zoom = (v->zoom - 1) / 1.1;
 		if (v->zoom < 4)
 			v->zoom = 1;
 	}

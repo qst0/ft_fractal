@@ -6,7 +6,7 @@
 /*   By: myoung <myoung@student.42.us.org>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/18 06:28:00 by myoung            #+#    #+#             */
-/*   Updated: 2016/11/18 06:52:02 by myoung           ###   ########.fr       */
+/*   Updated: 2016/11/18 21:43:20 by myoung           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,12 @@ void	redraw(t_view *view)
 {
 	view->changed = 0;
 	if (view->mode == '1')
-		show_fractal(view, mandelbrot);
+		view->fractal_func = mandelbrot;
 	else if (view->mode == '2')
-		show_fractal(view, julia_mouse);
+		view->fractal_func = julia_mouse;
 	else
-		show_fractal(view, julia_cubed_mouse);
+		view->fractal_func = julia_cubed_mouse;
+	thread_fractal(view);
 	use_view_image(view);
 }
 

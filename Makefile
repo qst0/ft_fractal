@@ -28,23 +28,27 @@ MINILIBX = $(INC_MINILIBX) $(LINK_MINILIBX)
 all: $(NAME)
 
 minilibx/libmlx.a:
-	make -C minilibx re
+	@echo "Making minilibx"
+	@make -C minilibx re
 
-$(NAME): minilibx/libmlx.a
-	$(CC) $(CFLAGS) $(MINILIBX) \
+$(NAME): $(SRC) minilibx/libmlx.a
+	@$(CC) $(CFLAGS) $(MINILIBX) \
 		$(INC) $(FRAMEWORKS) $(SRC) -o $(NAME)
+	@echo "Creating ./fract_ol"
 
 build:
 	mkdir build
 
 clean:
-	rm -rf build
+	@rm -rf build
+	@echo "clean successful"
 
 tclean:
 	make -C minilibx clean
 	make fclean
 
 fclean: clean
+	@echo "Removing ./fract_ol"
 	rm -f $(NAME)
 
 re: fclean all
